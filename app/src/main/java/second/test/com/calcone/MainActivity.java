@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView txtDisp;
 
     float acc = 0;
+    String operation = "";
     boolean error = false;
     boolean next = true;
 
@@ -185,44 +186,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if(v.equals(btnCalc)) {
             if(error) return;
-            float f = Float.parseFloat(txtDisp.getText().toString());
-            acc += f;
-            setTxtDisp(acc);
+            if(operation.equals("")) return;
+            String s = calc();
+            try {
+                if (Float.parseFloat(s) == 0) s = "0";
+            } catch (Exception e) {}
+            setTxtDisp(s);
         }
         if(v.equals(btnPlus)) {
             if(error) return;
-            float f = Float.parseFloat(txtDisp.getText().toString());
-            acc += f;
-            next = true;
-            setTxtDisp(acc);
+            if(!operation.equals("")) setTxtDisp(calc());
+            operation = "plus";
+            next();
         }
         if(v.equals(btnMinus)) {
             if(error) return;
-            float f = Float.parseFloat(txtDisp.getText().toString());
-            acc -= f;
-            next = true;
-            setTxtDisp(acc);
+            if(!operation.equals("")) setTxtDisp(calc());
+            operation = "minus";
+            next();
         }
         if(v.equals(btnMul)) {
             if(error) return;
-            float f = Float.parseFloat(txtDisp.getText().toString());
-            acc *= f;
-            next = true;
-            setTxtDisp(acc);
+            if(!operation.equals("")) setTxtDisp(calc());
+            operation = "mul";
+            next();
         }
         if(v.equals(btnDiv)) {
             if(error) return;
-            float f = Float.parseFloat(txtDisp.getText().toString());
-            if(f == 0) raiseError();
-            else {
-                acc /= f;
-                next = true;
-                setTxtDisp(acc);
-            }
+            if(!operation.equals("")) setTxtDisp(calc());
+            operation = "div";
+            next();
         }
         if(v.equals(btnC)) {
-            if(txtDisp.getText().length() > 0)
+            if(txtDisp.getText().length() > 1)
                 txtDisp.setText(txtDisp.getText().subSequence(0, txtDisp.getText().length()-1));
+            else if(txtDisp.getText().length() == 1)
+                txtDisp.setText("0");
         }
         if(v.equals(btnDel)) {
             acc = 0;
@@ -240,24 +239,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             txtDisp.setText(s);*/
         }
         if(v.equals(btnNeg))  {
+            // TODO
             setTxtDisp(Float.parseFloat(txtDisp.getText().toString()) * -1);
         }
         if(v.equals(btnRoot)) {
+            // TODO
             return;
         }
         if(v.equals(btnSquare)) {
+            // TODO
             return;
         }
         if(v.equals(btnMod)) {
+            // TODO
             return;
         }
         if(v.equals(btnSin)) {
+            // TODO
             return;
         }
         if(v.equals(btnCos)) {
+            // TODO
             return;
         }
         if(v.equals(btnTan)) {
+            // TODO
             return;
         }
 
@@ -265,14 +271,62 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setTxtDisp(float f){
         String s = Float.toString(f);
+        setTxtDisp(s);
+    }
+
+    private void setTxtDisp(String s){
         if(s.length() > 2 && s.substring(s.length()-2, s.length()).equals(".0"))
             s = s.substring(0, s.length()-2);
         txtDisp.setText(s);
 
     }
 
-    private void raiseError(){
+    private String raiseError(String s){
         error = true;
-        txtDisp.setText("ERROR");
+        return s;
+    }
+
+    private String calc(){
+        switch (operation){
+            case "plus": operation = ""; return plus();
+            case "minus": operation = ""; return minus();
+            case "mul": operation = ""; return mul();
+            case "div": operation = ""; return div();
+            default: operation = ""; return raiseError("UNKNOWN");
+        }
+    }
+
+    private String plus(){
+        Float f = Float.parseFloat(txtDisp.getText().toString());
+        acc += f;
+        operation = "";
+        return Float.toString(acc);
+    }
+
+    private String minus(){
+        Float f = Float.parseFloat(txtDisp.getText().toString());
+        acc -= f;
+        operation = "";
+        return Float.toString(acc);
+    }
+
+    private String mul(){
+        Float f = Float.parseFloat(txtDisp.getText().toString());
+        acc *= f;
+        operation = "";
+        return Float.toString(acc);
+    }
+
+    private String div(){
+        Float f = Float.parseFloat(txtDisp.getText().toString());
+        if(txtDisp.getText().toString().equals("0")) return raiseError("DIV 0");
+        acc /= f;
+        operation = "";
+        return Float.toString(acc);
+    }
+
+    private void next(){
+        next = true;
+        acc = Float.parseFloat(txtDisp.getText().toString());
     }
 }
